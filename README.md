@@ -81,6 +81,9 @@ Optional:
 * Settings -> Toggle settings
 
 ## Wireframes
+* These are our wireframes
+<img src='https://github.com/acoro013/GroupMapsProject/blob/master/wireframeOne.jpg' title='Video Walkthrough' width='' alt='Video Walkthrough' />
+<img src='https://github.com/acoro013/GroupMapsProject/blob/master/wireframeTwo.jpg' title='Video Walkthrough' width='' alt='Video Walkthrough' />
 
 ## Schema 
 ### Models
