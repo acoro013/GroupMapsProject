@@ -82,6 +82,39 @@ Optional:
 
 ## Wireframes
 
-### [BONUS] Digital Wireframes & Mockups
+## Schema 
+### Models
+#### Location of Interest
 
-### [BONUS] Interactive Prototype
+   | Property      | Type     | Description |
+   | ------------- | -------- | ------------|
+   | objectId      | String   | unique id for the location of interest (default field) |
+   | image         | File     | image representing the location of interest |
+   | longitude     | String   | longitude of location of interest |
+   | latitude      | String   | latitude of location of interest |
+   | description   | String   | description of location of interest |
+   | type          | String   | classification of location of interest |
+   | time          | DateTime | time of location of interest (optional) |
+   
+#### Events
+
+   | Property      | Type     | Description |
+   | ------------- | -------- | ------------|
+   | objectId      | String   | unique id for the event (default field) |
+   | user          | User     | creator of the event |
+   | locationOfInterest | Location of Interest | location of interest of the event |
+   | description   | String   | description of location of interest |
+   | time          | DateTime | time of event |
+   
+### Networking
+#### List of network requests by screen
+   - Search Screen
+      - (Read/Get) Query location of interest
+   - Save Screen
+      - (Create/Post) Create the location of interest in the app's database
+   - Events Screen
+      - (Create/Post) Create the event
+      - (Read/Get) Query events
+   - Profile Screen
+      - (Read/GET) Query logged in user object
+      - (Update/PUT) Update user profile image
