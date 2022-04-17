@@ -6,8 +6,10 @@ import android.content.pm.PackageManager
 import android.location.Location
 import android.location.LocationListener
 import android.location.LocationManager
+import android.os.Build
 import android.os.Bundle
 import android.util.Log
+import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
@@ -18,9 +20,11 @@ import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
+import java.util.concurrent.Executor
+import java.util.function.Consumer
 
 const val TAG = "MapsActivity"
-class MapsActivity : AppCompatActivity(), OnMapReadyCallback, LocationListener {
+class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
 
     private lateinit var mMap: GoogleMap
     private lateinit var binding: ActivityMapsBinding
@@ -47,6 +51,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, LocationListener {
      * it inside the SupportMapFragment. This method will only be triggered once the user has
      * installed Google Play services and returned to the app.
      */
+    @RequiresApi(Build.VERSION_CODES.R)
     override fun onMapReady(googleMap: GoogleMap) {
         mMap = googleMap
 
@@ -56,17 +61,14 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, LocationListener {
         getCurrentLocation()
     }
 
-    override fun onLocationChanged(location: Location) {
-        this.location = location
-        moveCamera(location.latitude, location.longitude)
-    }
-
     private fun moveCamera(latitude: Double, longitude: Double) {
         val latLng = LatLng(latitude, longitude)
-        val cameraUpdate = CameraUpdateFactory.newLatLng(latLng)
+        val zoom = 17f
+        val cameraUpdate = CameraUpdateFactory.newLatLngZoom(latLng, zoom)
         mMap.animateCamera(cameraUpdate)
     }
 
+    @RequiresApi(Build.VERSION_CODES.R)
     private fun getCurrentLocation() {
         // Check if app has not been granted ACCESS_FINE_LOCATION, then request for it.
         try {
@@ -88,6 +90,13 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, LocationListener {
 
         val locationManager = getSystemService(Context.LOCATION_SERVICE) as LocationManager
         // Get current location from GPS_PROVIDER to LocationListener
-        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0f, this)
+        locationManager.getCurrentLocation(LocationManager.GPS_PROVIDER, null, this.mainExecutor,
+            object: Consumer<Location> {
+                override fun accept(location: Location) {
+                    Log.d("peter", "onLocationChanged: ")
+                    this@MapsActivity.location = location
+                    moveCamera(location.latitude, location.longitude)
+                }
+        })
     }
 }
