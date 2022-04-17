@@ -32,7 +32,7 @@ Finds locations of interest: events, tourist attractions, entertainment location
 * User logs in or Guest account
 * Profile pages for each user
 * Profile images
-* Settings (Accesibility, Notification, General, etc.)
+* Settings (Accessibility, Notification, General, etc.)
 * Preference settings
 * Saves chosen location of interest
 * Gets weather condition
