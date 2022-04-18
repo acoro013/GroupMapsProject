@@ -1,16 +1,27 @@
 package com.example.groupmapsproject
 
-import androidx.appcompat.app.AppCompatActivity
+import android.Manifest
+import android.content.Context
+import android.content.pm.PackageManager
+import android.location.Location
+import android.location.LocationManager
+import android.os.Build
 import android.os.Bundle
-
+import android.util.Log
+import androidx.annotation.RequiresApi
+import androidx.appcompat.app.AppCompatActivity
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
+import com.example.groupmapsproject.databinding.ActivityMapsBinding
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
-import com.example.groupmapsproject.databinding.ActivityMapsBinding
+import java.util.function.Consumer
 
+const val TAG = "MapsActivity"
 class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
 
     private lateinit var mMap: GoogleMap
@@ -23,8 +34,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         setContentView(binding.root)
 
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
-        val mapFragment = supportFragmentManager
-            .findFragmentById(R.id.map) as SupportMapFragment
+        val mapFragment = supportFragmentManager.findFragmentById(R.id.map) as SupportMapFragment
         mapFragment.getMapAsync(this)
     }
 
@@ -37,16 +47,59 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
      * it inside the SupportMapFragment. This method will only be triggered once the user has
      * installed Google Play services and returned to the app.
      */
+    @RequiresApi(Build.VERSION_CODES.R)
     override fun onMapReady(googleMap: GoogleMap) {
         mMap = googleMap
 
         // Add a marker in Sydney and move the camera
         val sydney = LatLng(-34.0, 151.0)
-        val myLocation =
         mMap.addMarker(MarkerOptions().position(sydney).title("Marker in Sydney"))
-        mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney))
+        getCurrentLocation()
     }
 
+    @RequiresApi(Build.VERSION_CODES.R)
+    private fun getCurrentLocation() {
+        // Check if app has not been granted ACCESS_FINE_LOCATION, then request for it.
+        try {
+            if (ContextCompat.checkSelfPermission(
+                    applicationContext,
+                    Manifest.permission.ACCESS_FINE_LOCATION
+                ) != PackageManager.PERMISSION_GRANTED
+            ) {
+                ActivityCompat.requestPermissions(
+                    this,
+                    arrayOf(Manifest.permission.ACCESS_FINE_LOCATION),
+                    101
+                )
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+            Log.e(TAG, "getCurrentLocation: $e", )
+        }
 
+        val locationManager = getSystemService(Context.LOCATION_SERVICE) as LocationManager
+        // Get current location from GPS_PROVIDER to LocationListener
+        locationManager.getCurrentLocation(LocationManager.GPS_PROVIDER, null, this.mainExecutor,
+            object: Consumer<Location> {
+                override fun accept(location: Location) {
+                    displayLocation(location.latitude, location.longitude, "Current Location - Title", "Current Location - Snippet")
+                }
+        })
+    }
 
+    private fun displayLocation(latitude: Double, longitude: Double, title: String, snippet: String) {
+        val latLng = LatLng(latitude, longitude)
+        mMap.addMarker(
+            MarkerOptions().position(latLng)
+                .title(title)
+                .snippet(snippet))
+        moveCamera(latitude, longitude)
+    }
+
+    private fun moveCamera(latitude: Double, longitude: Double) {
+        val latLng = LatLng(latitude, longitude)
+        val zoom = 17f
+        val cameraUpdate = CameraUpdateFactory.newLatLngZoom(latLng, zoom)
+        mMap.animateCamera(cameraUpdate)
+    }
 }
