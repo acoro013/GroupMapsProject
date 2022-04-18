@@ -82,7 +82,6 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         locationManager.getCurrentLocation(LocationManager.GPS_PROVIDER, null, this.mainExecutor,
             object: Consumer<Location> {
                 override fun accept(location: Location) {
-                    Log.d("peter", "onLocationChanged: ")
                     displayLocation(location.latitude, location.longitude, "Current Location - Title", "Current Location - Snippet")
                 }
         })
