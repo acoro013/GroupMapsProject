@@ -4,7 +4,6 @@ import android.Manifest
 import android.content.Context
 import android.content.pm.PackageManager
 import android.location.Location
-import android.location.LocationListener
 import android.location.LocationManager
 import android.os.Build
 import android.os.Bundle
@@ -20,7 +19,6 @@ import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
-import java.util.concurrent.Executor
 import java.util.function.Consumer
 
 const val TAG = "MapsActivity"
@@ -28,7 +26,6 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
 
     private lateinit var mMap: GoogleMap
     private lateinit var binding: ActivityMapsBinding
-    private lateinit var location: Location
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -37,8 +34,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         setContentView(binding.root)
 
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
-        val mapFragment = supportFragmentManager
-            .findFragmentById(R.id.map) as SupportMapFragment
+        val mapFragment = supportFragmentManager.findFragmentById(R.id.map) as SupportMapFragment
         mapFragment.getMapAsync(this)
     }
 
@@ -59,13 +55,6 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         val sydney = LatLng(-34.0, 151.0)
         mMap.addMarker(MarkerOptions().position(sydney).title("Marker in Sydney"))
         getCurrentLocation()
-    }
-
-    private fun moveCamera(latitude: Double, longitude: Double) {
-        val latLng = LatLng(latitude, longitude)
-        val zoom = 17f
-        val cameraUpdate = CameraUpdateFactory.newLatLngZoom(latLng, zoom)
-        mMap.animateCamera(cameraUpdate)
     }
 
     @RequiresApi(Build.VERSION_CODES.R)
@@ -94,9 +83,24 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
             object: Consumer<Location> {
                 override fun accept(location: Location) {
                     Log.d("peter", "onLocationChanged: ")
-                    this@MapsActivity.location = location
-                    moveCamera(location.latitude, location.longitude)
+                    displayLocation(location.latitude, location.longitude, "Current Location - Title", "Current Location - Snippet")
                 }
         })
+    }
+
+    private fun displayLocation(latitude: Double, longitude: Double, title: String, snippet: String) {
+        val latLng = LatLng(latitude, longitude)
+        mMap.addMarker(
+            MarkerOptions().position(latLng)
+                .title(title)
+                .snippet(snippet))
+        moveCamera(latitude, longitude)
+    }
+
+    private fun moveCamera(latitude: Double, longitude: Double) {
+        val latLng = LatLng(latitude, longitude)
+        val zoom = 17f
+        val cameraUpdate = CameraUpdateFactory.newLatLngZoom(latLng, zoom)
+        mMap.animateCamera(cameraUpdate)
     }
 }
