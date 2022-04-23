@@ -8,10 +8,12 @@ import android.location.LocationManager
 import android.os.Build
 import android.os.Bundle
 import android.util.Log
+import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import androidx.fragment.app.Fragment
 import com.example.groupmapsproject.databinding.ActivityMapsBinding
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
@@ -19,6 +21,7 @@ import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
+import com.google.android.material.bottomnavigation.BottomNavigationView
 import java.util.function.Consumer
 
 const val TAG = "MapsActivity"
@@ -36,7 +39,26 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         val mapFragment = supportFragmentManager.findFragmentById(R.id.map) as SupportMapFragment
         mapFragment.getMapAsync(this)
-    }
+
+            findViewById<BottomNavigationView>(R.id.bottom_navigation).setOnItemSelectedListener{
+                    item ->
+                var fragmentToShow: Fragment? = null
+                when(item.itemId){
+                    /*
+                    R.id.map_home ->{
+                        Toast.makeText(this, "home", Toast.LENGTH_SHORT).show()
+                        fragmentToShow = MapsActivity()
+                    }
+                     */
+                    R.id.map_saved_places ->{
+                        Toast.makeText(this,"saved places", Toast.LENGTH_LONG).show()
+                        fragmentToShow = ListFragment()
+                    }
+                }
+                true
+            }
+
+        }
 
     /**
      * Manipulates the map once available.
